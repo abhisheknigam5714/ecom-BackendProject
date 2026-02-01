@@ -3,7 +3,11 @@ package com.ecommerce.ecomApplication.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -21,9 +25,15 @@ public class User {
     private String phone;
     private UserRole role=UserRole.CUSTOMER;
     //relationship between user and address
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
 
 }

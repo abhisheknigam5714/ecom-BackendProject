@@ -1,5 +1,6 @@
 package com.ecommerce.ecomApplication.controller;
 
+import com.ecommerce.ecomApplication.dtos.UserRes;
 import com.ecommerce.ecomApplication.model.User;
 import com.ecommerce.ecomApplication.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,13 @@ public class UserController {
 
 
     @GetMapping("/api/users")
-    public ResponseEntity<List<User>> findAllUser() {
+    public ResponseEntity<List<UserRes>> findAllUser() {
         return new ResponseEntity<>(userServiceimpl.fetchUser(), HttpStatus.OK);
 
     }
 
-    // @PostMapping("/api/users")
-    //this is  
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping("/api/users")
+   // @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> addUser(@RequestBody User user) {
 
         String s = userServiceimpl.addUser(user);
@@ -47,9 +47,9 @@ public class UserController {
 
     @PutMapping("/api/users/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
-        System.out.println(user.toString());
+
     Optional<User> userFind = userServiceimpl.findUser(id);
-        System.out.println(userFind);
+
         if (userFind == null) {
             return ResponseEntity.notFound().build();
         } else {
