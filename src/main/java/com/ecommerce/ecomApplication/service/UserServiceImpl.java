@@ -44,15 +44,15 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
     @Override
     public boolean updateUser(Long id, UserReq userReq) {
-        userRepository.findById(id).stream().map(existingUser->{
-            mapReqtoUser(existingUser,userReq);
-            userRepository.save(existingUser);
-            return true;
-        });
-        return false;
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        mapReqtoUser(existingUser, userReq);
+        userRepository.save(existingUser);
+        return true;
     }
 
     private void mapReqtoUser(User user, UserReq req){
