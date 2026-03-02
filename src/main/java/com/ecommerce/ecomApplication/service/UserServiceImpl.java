@@ -1,15 +1,17 @@
 package com.ecommerce.ecomApplication.service;
 
 import com.ecommerce.ecomApplication.dtos.AddressDto;
+import com.ecommerce.ecomApplication.dtos.UserReq;
 import com.ecommerce.ecomApplication.dtos.UserRes;
+import com.ecommerce.ecomApplication.model.Address;
 import com.ecommerce.ecomApplication.model.User;
 import com.ecommerce.ecomApplication.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +21,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserRes> fetchUser() {
+    public List<UserRes> fetchUser(){
         List<User> all = userRepository.findAll();
-        return mapToUserRes();
+        return all.stream().map(user-> mapToUserRes(user)).collect(Collectors.toList());
     }
 
     @Override
-    public String addUser(User user) {
+    public String addUser(UserReq req) {
+        User user= new User();
+        mapReqtoUser(user, req);
+
         User savedUser = userRepository.save(user);
         if (savedUser!=null) {
             return "User Added Successfully";
@@ -34,35 +39,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUser(Long id) {
-       return userRepository.findById(id);
+    public Optional<UserRes> findUser(Long id) {
+       return userRepository.findById(id).map(this:: mapToUserRes);
     }
 
 
     @Override
-    public boolean updateUser(Long id, User user) {
-
-        Optional<User> optionalUser = userRepository.findById(id);
-
-        if(optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-
-            // Update only required fields
-            existingUser.setFirstName(user.getFirstName());
-            existingUser.setLastName(user.getLastName());
-            existingUser.setEmail(user.getEmail());
-            existingUser.setPhone(user.getPhone());
-
-            // If user has address
-            if(user.getAddress() != null) {
-                existingUser.setAddress(user.getAddress());
-            }
-
+    public boolean updateUser(Long id, UserReq userReq) {
+        userRepository.findById(id).stream().map(existingUser->{
+            mapReqtoUser(existingUser,userReq);
             userRepository.save(existingUser);
             return true;
-        }
-
+        });
         return false;
+
+    }
+
+    private void mapReqtoUser(User user, UserReq req){
+
+        user.setFirstName(req.getFirstName());
+        user.setLastName(req.getLastName());
+        user.setEmail(req.getEmail());
+        user.setPhone(req.getPhone());
+    if(req.getAddressDto()!=null){
+        Address address= new Address();
+        address.setId(req.getAddressDto().getId());
+        address.setCity(req.getAddressDto().getCity());
+        address.setStreet(req.getAddressDto().getStreet());
+        address.setState(req.getAddressDto().getState());
+        address.setCountry(req.getAddressDto().getCountry());
+        address.setZipcode(req.getAddressDto().getZipcode());
+        user.setAddress(address);
+    }
+
     }
 
     private UserRes mapToUserRes(User user){
@@ -76,6 +85,7 @@ public class UserServiceImpl implements UserService {
 
         if(user.getAddress()!=null){
             AddressDto addressDto= new AddressDto();
+            addressDto.setId(user.getAddress().getId());
             addressDto.setCity(user.getAddress().getCity());
             addressDto.setStreet(user.getAddress().getStreet());
             addressDto.setState(user.getAddress().getState());

@@ -1,5 +1,7 @@
 package com.ecommerce.ecomApplication.service;
 
+import com.ecommerce.ecomApplication.dtos.UserReq;
+import com.ecommerce.ecomApplication.dtos.UserRes;
 import com.ecommerce.ecomApplication.model.User;
 import org.springframework.stereotype.Component;
 
@@ -8,12 +10,12 @@ import java.util.Optional;
 
 public interface UserService {
 
-    public List<User> fetchUser();
+    public List<UserRes> fetchUser();
 
 
-    public String addUser(User user);
+    public String addUser(UserReq user);
 
-    public Optional<User> findUser(Long id);
+    public Optional<UserRes> findUser(Long id);
 
-    public boolean updateUser(Long id,User user);
+    public boolean updateUser(Long id,UserReq user);
 }
