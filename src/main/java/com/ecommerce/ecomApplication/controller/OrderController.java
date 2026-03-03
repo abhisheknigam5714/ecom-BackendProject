@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -18,9 +20,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponse>  createOrder(@RequestHeader("X-User-Id") String userId){
-        OrderResponse order= orderService.createOrder(userId);
-        return new  ResponseEntity<>(order, HttpStatus.CREATED);
+    public ResponseEntity<OrderResponse>  createOrder(@RequestHeader("X-User-ID") String userId){
+        return  orderService.createOrder(userId).map(orderRes-> new ResponseEntity<>(orderRes,HttpStatus.CREATED)).orElseGet(()-> ResponseEntity.badRequest().build());
+
 
     }
 
