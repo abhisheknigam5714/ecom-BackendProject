@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,20 +57,17 @@ public class CartService {
     }
 
     public boolean removetItemFromCart(String userId, Long productId) {
-        Optional<Product> prodcutOpt = productRepository.findById(productId);
-        if(prodcutOpt.isEmpty()){
-            return false;
-        }
+        Optional<Product> productOpt = productRepository.findById(productId);
         Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
-        if(userOpt.isEmpty()) return false;
-
-
-        userOpt.flatMap(user ->
-                prodcutOpt.map(product ->{
-           cartItemRepository.deleteByUserAndProduct(user, product);
-           return true;
-                })
-        );
+        if(productOpt.isPresent() && userOpt.isPresent()){
+            cartItemRepository.deleteByUserAndProduct(userOpt.get(),productOpt.get());
+            return true;
+        }
         return false;
+    }
+
+    public List<CartItem> getAllItems(String id){
+      return userRepository.findById(Long.valueOf(id)).map(cartItemRepository::findByUser).orElseGet(List ::of);
+
     }
 }

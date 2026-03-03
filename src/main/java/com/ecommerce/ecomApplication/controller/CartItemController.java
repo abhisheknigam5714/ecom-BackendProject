@@ -32,4 +32,10 @@ public class CartItemController {
        boolean res= cartService.removetItemFromCart(userId,productId);
        return res? ResponseEntity.noContent().build():ResponseEntity.notFound().build();
     }
+
+    @GetMapping
+    public ResponseEntity<?> getAllItems(@RequestHeader("\"X-User-ID") String userId){
+
+        return ResponseEntity.ok(cartService.getAllItems(userId));
+    }
 }
